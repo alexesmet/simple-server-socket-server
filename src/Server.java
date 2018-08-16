@@ -19,9 +19,11 @@ public class Server {
             long lastLog = System.currentTimeMillis();
             while (!Thread.interrupted()) {
                 if (messages.size() > 0 && (System.currentTimeMillis()-lastLog >= MESSAGE_DELAY)) {
+                    String msg;
                     synchronized (messages) {
-                        System.out.println("> " + messages.poll());
+                        msg = messages.poll();
                     }
+                    System.out.println("> " + getMsgName(msg) + ": \"" + getMsgMessage(msg) +"\"");
                     lastLog = System.currentTimeMillis();
                 }
             }
@@ -40,11 +42,12 @@ public class Server {
                     byte[] buff = new byte[is.read()];
                     is.read(buff);
                     String message = new String(buff);
+                    String clientsName = getMsgName(message);
                     synchronized (messages) {
                         messages.add(message);
                     }
 
-                    String answer = "I have got your message, " + message.split(" ")[0];
+                    String answer = "I have got your message, " + clientsName;
                     os.write(answer.length());
                     os.write(answer.getBytes());
                     os.flush();
@@ -57,5 +60,13 @@ public class Server {
                 }
             }).start();
         }
+    }
+
+    private static String getMsgName(String msg){
+        return msg.substring(msg.indexOf("\"name\"") + "\"name\":\"".length(),msg.indexOf("\",\"message\":\""));
+    }
+
+    private static String getMsgMessage(String msg){
+        return msg.substring(msg.indexOf("\",\"message\":\"") + "\",\"message\":\"".length(),msg.indexOf("\"}"));
     }
 }
