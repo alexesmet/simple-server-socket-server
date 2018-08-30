@@ -16,12 +16,14 @@ The only way to stop the server for now is to interrupt it.
 
 
 ### Configuration
-For now, all the configs ar embedded inside `src/Main.java.`
+For now, all the configs ar embedded inside `src/com.itsm.core.Server.java.`
 
 ### TODO List
-- [ ] Move project to Gradle base
-- [ ] Add spring-boot annotation framework
+- [x] Move project to Gradle base
+- [ ] Add .gitignore
+- [ ] Add spring annotation framework
 - [ ] Add JSON map and parse classes with Jackson lib
 - [ ] Add `RequestProcessor` interface and its realization
 - [ ] Add `BeanPostProcessor` for modifying String output.
+- [ ] Add .properties file
 
