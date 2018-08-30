@@ -16,7 +16,7 @@ The only way to stop the server for now is to interrupt it.
 
 
 ### Configuration
-For now, all the configs ar embedded inside `src/Server.java.`
+For now, all the configs ar embedded inside `src/Main.java.`
 
 ### TODO List
 - [ ] Move project to Gradle base
