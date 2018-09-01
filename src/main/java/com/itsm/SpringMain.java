@@ -1,5 +1,6 @@
 package com.itsm;
 
+import com.itsm.core.Server;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 public class SpringMain {
@@ -7,7 +8,8 @@ public class SpringMain {
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(SpringConfig.class);
         context.registerShutdownHook();
 
-
+        Server server = context.getBean(Server.class);
+        server.run();
 
     }
 }

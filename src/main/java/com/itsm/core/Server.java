@@ -1,5 +1,10 @@
 package com.itsm.core;
 
+import com.itsm.util.ThreadSleeper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.IOException;
@@ -10,8 +15,6 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-
-
 public class Server implements Runnable {
 
     private final int messageDelay;
@@ -20,22 +23,35 @@ public class Server implements Runnable {
     private ServerSocket serverSocket;
     private ExecutorService executorService;
 
-    public Server(int serverPort) {
+    /*public Server(int serverPort) {
         this.serverPort = serverPort;
         messageDelay = 1000;
         maxThreadCount = 4;
-    }
+    }*/
 
     public Server(int messageDelay, int serverPort, int maxThreadCount) {
         this.messageDelay = messageDelay;
         this.serverPort = serverPort;
         this.maxThreadCount = maxThreadCount;
+
+        //TODO: Move the following to @PostConstruct (when it gets repaired)
+        executorService = Executors.newFixedThreadPool(maxThreadCount);
+        while (true) {
+            try {
+                serverSocket = new ServerSocket(serverPort);
+                break;
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.err.println("Could not create serverSocket. Retry in 5 sec");
+                ThreadSleeper.sleep(5000);
+            }
+        }
+
     }
 
     @PostConstruct
-    public void init() throws IOException {
-        serverSocket = new ServerSocket(serverPort);
-        executorService = Executors.newFixedThreadPool(maxThreadCount);
+    public void init() {
+        System.out.println("Server.init");
     }
 
     @PreDestroy
@@ -55,7 +71,7 @@ public class Server implements Runnable {
     public void run() {
         System.out.println("Server is up!");
 
-        while (!Thread.interrupted() && !executorService.isShutdown()) {
+        while (!executorService.isShutdown()) {
 
             try {
                 Socket accept = serverSocket.accept();
@@ -90,4 +106,12 @@ public class Server implements Runnable {
         System.out.println("Server was stopped.");
     }
 
+    @Override
+    public String toString() {
+        return "Server{" +
+                "messageDelay=" + messageDelay +
+                ", serverPort=" + serverPort +
+                ", maxThreadCount=" + maxThreadCount +
+                '}';
+    }
 }
