@@ -21,7 +21,7 @@ public class SpringConfig {
         return new Server(
                 environment.getProperty("server.messagedelay", Integer.class, 100),
                 environment.getProperty("server.port",Integer.class, 8088),
-                environment.getProperty("server.threadcount", Integer.class, 4));
+                environment.getProperty("server.threadcount", Integer.class, 4), objectMapper);
     }
 
 }
