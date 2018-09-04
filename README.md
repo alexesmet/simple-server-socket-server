@@ -22,7 +22,7 @@ For now, all the configs ar embedded inside `src/com.itsm.core.Server.java.`
 - [x] Move project to Gradle base
 - [x] Add .gitignore
 - [x] Add spring annotation framework
-- [ ] Add JSON map and parse classes with Jackson lib
+- [x] Add JSON map and parse classes with Jackson lib
 - [ ] Add `RequestProcessor` interface and its realization
 - [ ] Add `BeanPostProcessor` for modifying String output.
 - [x] Add .properties file
