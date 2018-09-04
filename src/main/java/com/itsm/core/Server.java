@@ -1,17 +1,18 @@
 package com.itsm.core;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.itsm.parse.JsonRequest;
+import com.itsm.parse.JsonResponse;
+import com.itsm.processors.RequestProcessor;
 import com.itsm.util.ThreadSleeper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import javax.inject.Provider;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -20,21 +21,31 @@ public class Server implements Runnable {
     private final int messageDelay;
     private final int serverPort;
     private final int maxThreadCount;
+    private final ObjectMapper objectMapper;
+    private final Provider<List<RequestProcessor>> requestProcessorProvider;
     private ServerSocket serverSocket;
     private ExecutorService executorService;
 
-    /*public Server(int serverPort) {
+    public Server(int serverPort, ObjectMapper objectMapper, Provider<List<RequestProcessor>> requestProcessorProvider) {
         this.serverPort = serverPort;
+        this.objectMapper = new ObjectMapper();
+        this.requestProcessorProvider = requestProcessorProvider;
         messageDelay = 1000;
         maxThreadCount = 4;
-    }*/
+    }
 
-    public Server(int messageDelay, int serverPort, int maxThreadCount) {
+    public Server(int messageDelay, int serverPort, int maxThreadCount, ObjectMapper objectMapper, Provider<List<RequestProcessor>> requestProcessorProvider) {
         this.messageDelay = messageDelay;
         this.serverPort = serverPort;
         this.maxThreadCount = maxThreadCount;
+        this.objectMapper = objectMapper;
+        this.requestProcessorProvider = requestProcessorProvider;
+    }
 
-        //TODO: Move the following to @PostConstruct (when it gets repaired)
+    @PostConstruct
+    public void init() {
+        System.out.println("Debug: Server.init");
+
         executorService = Executors.newFixedThreadPool(maxThreadCount);
         while (true) {
             try {
@@ -46,12 +57,6 @@ public class Server implements Runnable {
                 ThreadSleeper.sleep(5000);
             }
         }
-
-    }
-
-    @PostConstruct
-    public void init() {
-        System.out.println("Server.init");
     }
 
     @PreDestroy
@@ -79,16 +84,30 @@ public class Server implements Runnable {
                     try {
                         InputStream is = accept.getInputStream();
                         OutputStream os = accept.getOutputStream();
+                        DataInputStream dis = new DataInputStream(is);
+                        DataOutputStream dos = new DataOutputStream(os);
 
-                        byte[] buff = new byte[is.read()];
-                        is.read(buff);
-                        String message = new String(buff);
+                        JsonRequest request = objectMapper.readValue(dis.readUTF(), JsonRequest.class);
 
+                        JsonResponse response = null;
 
-                        String answer = "I have got your message, "; //TODO: Add response processor
-                        os.write(answer.length());
-                        os.write(answer.getBytes());
-                        os.flush();
+                        List<RequestProcessor> requestProcessors = requestProcessorProvider.get();
+                        for (RequestProcessor rp:requestProcessors) {
+                            if(rp.canProcess(request)){
+                                response = rp.process(request);
+                                break;
+                            }
+                        }
+
+                        String answer;
+                        if (response != null) {
+                            answer = objectMapper.writeValueAsString(response);
+                        } else {
+                            answer = "# Error reading your message: no suitable request processor";
+                        }
+
+                        dos.writeUTF(answer);
+                        dos.flush();
 
                         accept.close();
 

@@ -1,9 +1,9 @@
 package com.itsm.processors;
 
-import com.itsm.parse.Request;
-import com.itsm.parse.Response;
+import com.itsm.parse.JsonRequest;
+import com.itsm.parse.JsonResponse;
 
 public interface RequestProcessor {
-    public boolean canProcess(Request req);
-    public Response process(Request req);
+    boolean canProcess(JsonRequest req);
+    JsonResponse process(JsonRequest req);
 }

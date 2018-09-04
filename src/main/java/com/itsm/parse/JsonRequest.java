@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.util.Objects;
 
 @JsonPropertyOrder({"name", "message"})
-public class JsonRequest implements Request{
+public class JsonRequest{
     @JsonProperty("name")
     private String name;
 

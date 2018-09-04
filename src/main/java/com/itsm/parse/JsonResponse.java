@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Objects;
 
-public class JsonResponse implements Response{
+public class JsonResponse{
     @JsonProperty
     private String message;
 
