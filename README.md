@@ -16,14 +16,14 @@ The only way to stop the server for now is to interrupt it.
 
 
 ### Configuration
-For now, all the configs ar embedded inside `src/com.itsm.core.Server.java.`
+server.properties file
 
 ### TODO List
-- [x] Move project to Gradle base
-- [x] Add .gitignore
-- [x] Add spring annotation framework
-- [x] Add JSON map and parse classes with Jackson lib
+- [x] Gradle + Spring
+- [x] Add .properties file
+- [x] Now works on Json
 - [ ] Add `RequestProcessor` interface and its realization
 - [ ] Add `BeanPostProcessor` for modifying String output.
-- [x] Add .properties file
+- [ ] Adadpt client for this
+
 
