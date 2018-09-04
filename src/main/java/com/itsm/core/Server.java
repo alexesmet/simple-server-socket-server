@@ -26,13 +26,13 @@ public class Server implements Runnable {
     private ServerSocket serverSocket;
     private ExecutorService executorService;
 
-    public Server(int serverPort, ObjectMapper objectMapper, Provider<List<RequestProcessor>> requestProcessorProvider) {
+    /*public Server(int serverPort, Provider<List<RequestProcessor>> requestProcessorProvider) {
         this.serverPort = serverPort;
         this.objectMapper = new ObjectMapper();
         this.requestProcessorProvider = requestProcessorProvider;
         messageDelay = 1000;
         maxThreadCount = 4;
-    }
+    }*/
 
     public Server(int messageDelay, int serverPort, int maxThreadCount, ObjectMapper objectMapper, Provider<List<RequestProcessor>> requestProcessorProvider) {
         this.messageDelay = messageDelay;
@@ -44,7 +44,7 @@ public class Server implements Runnable {
 
     @PostConstruct
     public void init() {
-        System.out.println("Debug: Server.init");
+        System.out.println("# Debug: Server.init");
 
         executorService = Executors.newFixedThreadPool(maxThreadCount);
         while (true) {
@@ -53,7 +53,7 @@ public class Server implements Runnable {
                 break;
             } catch (IOException e) {
                 e.printStackTrace();
-                System.err.println("Could not create serverSocket. Retry in 5 sec");
+                System.err.println("# Could not create serverSocket. Retry in 5 sec");
                 ThreadSleeper.sleep(5000);
             }
         }
@@ -99,30 +99,31 @@ public class Server implements Runnable {
                             }
                         }
 
-                        String answer;
-                        if (response != null) {
-                            answer = objectMapper.writeValueAsString(response);
-                        } else {
-                            answer = "# Error reading your message: no suitable request processor";
+                        if (response == null) {
+                            response = new JsonResponse("We can't process such kind of a message yet.");
                         }
 
+                        String answer = objectMapper.writeValueAsString(response);
                         dos.writeUTF(answer);
                         dos.flush();
 
                         accept.close();
+
+                        ThreadSleeper.sleep(messageDelay);
+                        System.out.println("> "+request.getName()+": "+request.getMessage());
 
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 });
             } catch (IOException e) {
-                System.err.println("Could not socket.accept");
+                System.err.println("# Could not socket.accept");
                 e.printStackTrace();
             }
 
         }
 
-        System.out.println("Server was stopped.");
+        System.out.println("# Server was stopped.");
     }
 
     @Override
@@ -133,4 +134,5 @@ public class Server implements Runnable {
                 ", maxThreadCount=" + maxThreadCount +
                 '}';
     }
+
 }

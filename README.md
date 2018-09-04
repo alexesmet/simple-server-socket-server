@@ -24,6 +24,6 @@ server.properties file
 - [x] Now works on Json
 - [ ] Add `RequestProcessor` interface and its realization
 - [ ] Add `BeanPostProcessor` for modifying String output.
-- [ ] Adadpt client for this
+- [ ] Adapt client for this
 
 
