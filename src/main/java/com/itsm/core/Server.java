@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itsm.parse.JsonRequest;
 import com.itsm.parse.JsonResponse;
 import com.itsm.processors.RequestProcessor;
+import com.itsm.util.DoMoo;
 import com.itsm.util.ThreadSleeper;
 import javax.inject.Provider;
 
@@ -128,6 +129,7 @@ public class Server implements Runnable {
     }
 
     @Override
+    @DoMoo
     public String toString() {
         return "Server{" +
                 "messageDelay=" + messageDelay +

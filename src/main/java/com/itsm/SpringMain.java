@@ -8,8 +8,11 @@ public class SpringMain {
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(SpringConfig.class);
         context.registerShutdownHook();
 
-        Server server = context.getBean(Server.class);
-        server.run(); //TODO: Config docker file
+        Runnable server = (Runnable) context.getBean("Server");
+        // server.run(); //TODO: Config docker file
+        System.out.println( server.toString());
+
+
 
     }
 }

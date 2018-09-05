@@ -26,7 +26,7 @@ public class SpringConfig {
         return new ObjectMapper();
     }
 
-    @Bean/*(initMethod = "init")*/
+    @Bean(name = "Server")
     public Server getServer(Provider<List<RequestProcessor>> requestProcessorProvider, ObjectMapper objectMapper){
         return new Server(
                 environment.getProperty("server.messagedelay", Integer.class, 100),
