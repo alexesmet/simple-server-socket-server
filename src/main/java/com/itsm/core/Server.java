@@ -5,10 +5,10 @@ import com.itsm.parse.JsonRequest;
 import com.itsm.parse.JsonResponse;
 import com.itsm.processors.RequestProcessor;
 import com.itsm.util.ThreadSleeper;
+import javax.inject.Provider;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.inject.Provider;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -26,13 +26,13 @@ public class Server implements Runnable {
     private ServerSocket serverSocket;
     private ExecutorService executorService;
 
-    /*public Server(int serverPort, Provider<List<RequestProcessor>> requestProcessorProvider) {
+    public Server(int serverPort, Provider<List<RequestProcessor>> requestProcessorProvider) {
         this.serverPort = serverPort;
         this.objectMapper = new ObjectMapper();
         this.requestProcessorProvider = requestProcessorProvider;
         messageDelay = 1000;
         maxThreadCount = 4;
-    }*/
+    }
 
     public Server(int messageDelay, int serverPort, int maxThreadCount, ObjectMapper objectMapper, Provider<List<RequestProcessor>> requestProcessorProvider) {
         this.messageDelay = messageDelay;
@@ -74,7 +74,7 @@ public class Server implements Runnable {
     }
 
     public void run() {
-        System.out.println("Server is up!");
+        System.out.println("# Server is up!");
 
         while (!executorService.isShutdown()) {
 

@@ -9,7 +9,7 @@ public class SpringMain {
         context.registerShutdownHook();
 
         Server server = context.getBean(Server.class);
-        server.run();
+        server.run(); //TODO: Config docker file
 
     }
 }
