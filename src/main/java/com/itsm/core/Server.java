@@ -44,8 +44,7 @@ public class Server implements Runnable {
 
     @PostConstruct
     public void init() {
-        System.out.println("# Debug: Server.init");
-
+        //System.out.println("# Debug: Server.init");
         executorService = Executors.newFixedThreadPool(maxThreadCount);
         while (true) {
             try {
@@ -117,8 +116,10 @@ public class Server implements Runnable {
                     }
                 });
             } catch (IOException e) {
-                System.err.println("# Could not socket.accept");
-                e.printStackTrace();
+                if (!executorService.isShutdown()) {
+                    System.err.println("# Accepting from socket was interrupted.");
+                    e.printStackTrace();
+                }
             }
 
         }
