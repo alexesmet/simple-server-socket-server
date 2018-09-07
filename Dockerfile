@@ -1,5 +1,7 @@
 FROM openjdk:11
-COPY ./src /usr/src/simple-server
-WORKDIR /usr/src/simple-server
-RUN javac com.itsm.core.Server.java
-ENTRYPOINT ["java", "com.itsm.core.Server"]
+COPY . /usr/simple-server
+WORKDIR /usr/simple-server
+RUN apt-get install gradle \
+&& gradle build \
+&& cd build/libs
+ENTRYPOINT ["java","-jar", "simple-server-socket-server-1.0.jar"]
