@@ -11,15 +11,20 @@ import java.util.*;
 @Component
 public class DoMooAnnotationBeanPostProcessor implements BeanPostProcessor{
 
-    private Map<String, Object> beans = new HashMap<>();
+    private Map<String, BeanMarkedMethods> beans = new HashMap<>();
 
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
 
-        boolean match = Arrays.stream(bean.getClass().getMethods())
-                .anyMatch(m -> suits(m));
-        if (match) {
-            beans.put(beanName, bean);
+        Method[] beanMethods = bean.getClass().getMethods();
+        for (Method m : beanMethods) {
+            if (suits(m)){
+                if (beans.containsKey(beanName)){
+                    beans.get(beanName).add(m);
+                } else {
+                    beans.put(beanName,new BeanMarkedMethods(bean, m));
+                }
+            }
         }
         return bean;
     }
@@ -27,19 +32,20 @@ public class DoMooAnnotationBeanPostProcessor implements BeanPostProcessor{
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         if (beans.containsKey(beanName)) {
-            Object original = beans.get(beanName);
-            Object beanProxy = Proxy.newProxyInstance(
+            BeanMarkedMethods beanMarkedMethods = beans.get(beanName);
+            Object original = beanMarkedMethods.getOriginalBean();
+            return Proxy.newProxyInstance(
                     original.getClass().getClassLoader(),
                     original.getClass().getInterfaces(),
                     (proxy, method, args) -> {
                         Object result = method.invoke(original, args);
-                        if ( suits(method) ){
-                            result = "MOOOOOOOOOOOO!!!"; //TODO: find out how to see if it had annotations
+                        if ( beanMarkedMethods.contains(method.getName())){
+                            result = "MOOOOOOOOOOOO!!!";
                         }
                         return result;
                     }
             );
-            return beanProxy;
+
         }
         return bean;
     }
@@ -49,5 +55,28 @@ public class DoMooAnnotationBeanPostProcessor implements BeanPostProcessor{
                 || method.getName().contains("DoMoo")
                 || Arrays.stream(method.getDeclaringClass().getInterfaces())
                         .anyMatch(i -> i == Mooable.class);
+    }
+
+    private class BeanMarkedMethods{
+        private final Object originalBean;
+        private List<String> methods;
+
+        BeanMarkedMethods(Object originalBean, Method firstMethod) {
+            this.originalBean = originalBean;
+            this.methods = new ArrayList<>();
+            this.methods.add(firstMethod.getName());
+        }
+
+        Object getOriginalBean() {
+            return originalBean;
+        }
+
+        void add(Method m){
+            methods.add(m.getName());
+        }
+
+        boolean contains(String name){
+            return methods.contains(name);
+        }
     }
 }
