@@ -10,15 +10,11 @@ import static org.junit.Assert.*;
 
 public class ByeRequestProcessorTest {
 
-    ByeRequestProcessor processor;
+    private ByeRequestProcessor processor;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         processor = new ByeRequestProcessor();
-    }
-
-    @After
-    public void tearDown() throws Exception {
     }
 
     @Test
@@ -34,7 +30,7 @@ public class ByeRequestProcessorTest {
     }
 
     @Test
-    public void process() {
+    public void process() throws NullPointerException {
         JsonRequest req = new JsonRequest("Name", "see you later");
         JsonResponse process = null;
         if (processor.canProcess(req)) {
