@@ -88,20 +88,8 @@ public class Server implements Runnable {
                         DataOutputStream dos = new DataOutputStream(os);
 
                         JsonRequest request = objectMapper.readValue(dis.readUTF(), JsonRequest.class);
+                        JsonResponse response = chooseRequestProcessor(request);
 
-                        JsonResponse response = null;
-
-                        List<RequestProcessor> requestProcessors = requestProcessorProvider.get();
-                        for (RequestProcessor rp:requestProcessors) {
-                            if(rp.canProcess(request)){
-                                response = rp.process(request);
-                                break;
-                            }
-                        }
-
-                        if (response == null) {
-                            response = new JsonResponse("We can't process such kind of a message yet.");
-                        }
 
                         String answer = objectMapper.writeValueAsString(response);
                         dos.writeUTF(answer);
@@ -126,6 +114,23 @@ public class Server implements Runnable {
         }
 
         System.out.println("# Server was stopped.");
+    }
+
+    private JsonResponse chooseRequestProcessor(JsonRequest request){
+        JsonResponse response = null;
+
+        List<RequestProcessor> requestProcessors = requestProcessorProvider.get();
+        for (RequestProcessor rp:requestProcessors) {
+            if(rp.canProcess(request)){
+                response = rp.process(request);
+                break;
+            }
+        }
+
+        if (response == null) {
+            response = new JsonResponse("We can't process such kind of a message yet.");
+        }
+        return response;
     }
 
     @Override
